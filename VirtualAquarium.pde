@@ -15,7 +15,7 @@
 // - Animated aquarium environment
 //
 // Developers:
-// Kenneth + Korede + Yahaya
+// Kenneth
 // ==========================================
 ArrayList<Fish> fishList;
 
