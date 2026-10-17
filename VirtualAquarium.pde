@@ -1,111 +1,139 @@
-// ==========================================
-// Virtual Aquarium Simulation
-//
-// Course: Interactive Systems
-//
-// Description:
-// An animated aquarium simulation where
-// fish objects move independently using
-// object-oriented programming.
-//
-// Current Features:
-// - Multiple fish objects
-// - Random swimming behaviour
-// - Wall avoidance
-// - Animated aquarium environment
-//
-// Developers:
-// Kenneth Nnah (100856333)
-// ==========================================
+
+/*
+ * Virtual Aquarium Simulation
+ * Course: Interactive Systems (UI/UX)
+ * Developer: Kenneth
+ *
+ * Features:
+ * - 15 independently swimming fish
+ * - Random wandering and wall avoidance
+ * - Mouse clicks create sinking food
+ * - Fish chase and eat nearby food
+ * - Fish avoid the mouse cursor
+ * - Day/night mode (N key)
+ * - Energy bars that affect swimming speed
+ * - Animated rising bubbles
+ */
+
 ArrayList<Fish> fishList;
+ArrayList<Food> foodList;
 
+// Day/night mode
+boolean isNight = false;
 
+// Bubble positions
+float[] bubbleX = new float[20];
+float[] bubbleY = new float[20];
+float[] bubbleSpeed = new float[20];
 
-// Runs once when the program starts
 void setup() {
-
-  // Create the aquarium window
   size(900, 600);
+  frameRate(60);
 
-
-  // Initialize the ArrayList
   fishList = new ArrayList<Fish>();
+  foodList = new ArrayList<Food>();
 
-
-  // Create 15 fish objects
-  // Each fish starts at a random position
-  for(int i = 0; i < 15; i++){
-
+  // Create 15 fish at random positions
+  for (int i = 0; i < 15; i++) {
     Fish newFish = new Fish(
-      random(width),   // random x position
-      random(height)   // random y position
+      random(50, width - 50),
+      random(50, height - 50)
     );
 
-
-    // Add the fish object to our list
     fishList.add(newFish);
-
   }
 
+  // Initialize bubbles
+  for (int i = 0; i < bubbleX.length; i++) {
+    bubbleX[i] = random(width);
+    bubbleY[i] = random(height);
+    bubbleSpeed[i] = random(0.5, 2);
+  }
 }
 
-
-
-// Runs repeatedly (60 frames per second by default)
-// This creates the animation loop
 void draw() {
 
+  // Aquarium background
+  if (isNight) {
+    background(5, 20, 50);
+  } else {
+    background(20, 120, 180);
+  }
 
-  // Draw the water background
-  background(20,120,180);
-
-
-
-  // Draw decorative bubbles
+  // Draw animated bubbles
   drawBubbles();
 
+  // Update food particles
+  for (Food food : foodList) {
+    food.move();
+    food.display();
+  }
 
+  // Update fish
+  for (Fish fish : fishList) {
 
-  // Loop through every fish in the aquarium
-  for(Fish fish : fishList){
+    // Random wandering
+    fish.wander();
 
+    // Chase nearby food
+    fish.chaseFood(foodList);
 
-    // Update fish position
+    // Avoid mouse cursor
+    fish.avoidPredator();
+
+    // Move based on energy
     fish.move();
 
-
-    // Draw the fish
+    // Draw fish and energy bar
     fish.display();
-
-
   }
 
+  // Display controls and current mode
+  fill(255);
+  textSize(18);
+  textAlign(LEFT);
 
+  if (isNight) {
+    text("Night Mode - Press N for Day", 20, 30);
+  } else {
+    text("Day Mode - Press N for Night", 20, 30);
+  }
+
+  textSize(14);
+  text("Click to feed fish | Move mouse to scare fish", 20, 52);
 }
 
+// Mouse click drops food
+void mousePressed() {
+  foodList.add(new Food(mouseX, mouseY));
+}
 
+// Animate bubbles rising through water
+void drawBubbles() {
 
-// Creates bubbles for aquarium appearance
-void drawBubbles(){
+  noStroke();
+  fill(255, 150);
 
+  for (int i = 0; i < bubbleX.length; i++) {
 
-  // Make bubbles transparent white
-  fill(255,150);
+    // Move bubble upward
+    bubbleY[i] -= bubbleSpeed[i];
 
+    // Reset bubble when it reaches the top
+    if (bubbleY[i] < 0) {
+      bubbleY[i] = height;
+      bubbleX[i] = random(width);
+    }
 
-  // Create 20 random bubbles
-  for(int i = 0; i < 20; i++){
-
-
-    ellipse(
-      random(width),   // x position
-      random(height),  // y position
-      8,               // bubble width
-      8                // bubble height
-    );
-
-
+    ellipse(bubbleX[i], bubbleY[i], 8, 8);
   }
+}
 
+// Keyboard controls
+void keyPressed() {
 
+  // Toggle day/night mode
+  if (key == 'n' || key == 'N') {
+    isNight = !isNight;
+  }
 }
