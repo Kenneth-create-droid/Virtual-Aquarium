@@ -15,7 +15,7 @@
 // - Animated aquarium environment
 //
 // Developers:
-// Kenneth
+// Kenneth Nnah (100856333)
 // ==========================================
 ArrayList<Fish> fishList;
 
